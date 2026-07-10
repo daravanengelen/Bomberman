@@ -1,26 +1,83 @@
+# CI for the Advanced Programming Bomberman project.
+# Reference platform (assignment section 4.3):
+#   Ubuntu 24.04.3, SFML 2.6.1, CMake 3.28.3, G++ 13.2.0, Clang 18.0.0
+
 version: 2.1
 
+commands:
+  install-base-deps:
+    description: Build tools shared by all jobs (git required for checkout on bare Ubuntu)
+    steps:
+      - run:
+          name: Install base dependencies
+          command: |
+            apt-get update
+            DEBIAN_FRONTEND=noninteractive apt-get install -y \
+              ca-certificates \
+              git \
+              cmake \
+              ninja-build \
+              g++-13
+
+  print-toolchain-versions:
+    description: Log installed versions for comparison with the reference platform
+    parameters:
+      compiler:
+        type: string
+    steps:
+      - run:
+          name: Print toolchain versions
+          command: |
+            echo "Expected reference: Ubuntu 24.04, SFML 2.6.1, CMake 3.28.3, G++ 13.2.0, Clang 18.0.0"
+            cmake --version | head -1
+            g++-13 --version | head -1
+            << parameters.compiler >> --version | head -1
+            dpkg -l libsfml-dev 2>/dev/null | tail -1 || echo "libsfml-dev: not installed (logic-only job)"
+
 jobs:
+  # Assignment section 3.1: logic library must compile without SFML installed.
+  build-logic:
+    docker:
+      - image: ubuntu:24.04
+    steps:
+      - checkout
+      - install-base-deps
+      - run:
+          name: Print toolchain versions
+          command: |
+            echo "Expected reference: Ubuntu 24.04, CMake 3.28.3, G++ 13.2.0"
+            cmake --version | head -1
+            g++-13 --version | head -1
+      - run:
+          name: Configure logic library (no SFML)
+          command: |
+            cmake -S libs/logic -B build-logic -G Ninja \
+              -DCMAKE_BUILD_TYPE=Debug \
+              -DCMAKE_CXX_COMPILER=g++-13
+      - run:
+          name: Build logic library (no SFML)
+          command: cmake --build build-logic -j 2
+
   build-gcc:
     docker:
       - image: ubuntu:24.04
     steps:
       - checkout
+      - install-base-deps
       - run:
-          name: Install dependencies
+          name: Install SFML and GCC toolchain
           command: |
-            apt-get update
-            DEBIAN_FRONTEND=noninteractive apt-get install -y \
-              build-essential \
-              cmake \
-              clang \
-              libsfml-dev \
-              ninja-build
+            DEBIAN_FRONTEND=noninteractive apt-get install -y libsfml-dev
+      - print-toolchain-versions:
+          compiler: g++-13
       - run:
-          name: Configure with GCC
-          command: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=g++
+          name: Configure with GCC 13
+          command: |
+            cmake -S . -B build -G Ninja \
+              -DCMAKE_BUILD_TYPE=Debug \
+              -DCMAKE_CXX_COMPILER=g++-13
       - run:
-          name: Build with GCC
+          name: Build with GCC 13
           command: cmake --build build -j 2
 
   build-clang:
@@ -28,25 +85,29 @@ jobs:
       - image: ubuntu:24.04
     steps:
       - checkout
+      - install-base-deps
       - run:
-          name: Install dependencies
+          name: Install SFML and Clang 18 toolchain
           command: |
-            apt-get update
             DEBIAN_FRONTEND=noninteractive apt-get install -y \
-              build-essential \
-              cmake \
-              clang \
               libsfml-dev \
-              ninja-build
+              clang-18 \
+              libstdc++-13-dev
+      - print-toolchain-versions:
+          compiler: clang++-18
       - run:
-          name: Configure with Clang
-          command: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++
+          name: Configure with Clang 18
+          command: |
+            cmake -S . -B build -G Ninja \
+              -DCMAKE_BUILD_TYPE=Debug \
+              -DCMAKE_CXX_COMPILER=clang++-18
       - run:
-          name: Build with Clang
+          name: Build with Clang 18
           command: cmake --build build -j 2
 
 workflows:
   build-and-verify:
     jobs:
+      - build-logic
       - build-gcc
       - build-clang
