@@ -1,0 +1,52 @@
+version: 2.1
+
+jobs:
+  build-gcc:
+    docker:
+      - image: ubuntu:24.04
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            apt-get update
+            DEBIAN_FRONTEND=noninteractive apt-get install -y \
+              build-essential \
+              cmake \
+              clang \
+              libsfml-dev \
+              ninja-build
+      - run:
+          name: Configure with GCC
+          command: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=g++
+      - run:
+          name: Build with GCC
+          command: cmake --build build -j 2
+
+  build-clang:
+    docker:
+      - image: ubuntu:24.04
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            apt-get update
+            DEBIAN_FRONTEND=noninteractive apt-get install -y \
+              build-essential \
+              cmake \
+              clang \
+              libsfml-dev \
+              ninja-build
+      - run:
+          name: Configure with Clang
+          command: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++
+      - run:
+          name: Build with Clang
+          command: cmake --build build -j 2
+
+workflows:
+  build-and-verify:
+    jobs:
+      - build-gcc
+      - build-clang
