@@ -63,7 +63,7 @@ private:
     sf::Sprite m_sprite;
 };
 
-/** @brief Renders characters as colored circles. */
+/** @brief Renders characters as sprites. */
 class CharacterView final : public EntityView {
 public:
     CharacterView(const std::shared_ptr<Logic::Entity>& model, Logic::Camera& camera);
@@ -74,7 +74,7 @@ private:
     sf::Sprite m_sprite;
 };
 
-/** @brief Renders active bombs as small circles. */
+/** @brief Renders active bombs as sprites. */
 class BombView final : public EntityView {
 public:
     BombView(const std::shared_ptr<Logic::Entity>& model, Logic::Camera& camera);
@@ -85,7 +85,7 @@ private:
     sf::Sprite m_sprite;
 };
 
-/** @brief Renders power-ups as diamonds (rotated rectangles). */
+/** @brief Renders power-ups as sprites. */
 class PowerUpView final : public EntityView {
 public:
     PowerUpView(const std::shared_ptr<Logic::Entity>& model, Logic::Camera& camera);

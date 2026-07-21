@@ -113,9 +113,9 @@ const sf::IntRect kExtraBombPowerUpRect = tileRect(1, 22);
 const sf::IntRect kSkatesPowerUpRect = tileRect(2, 22);
 
 // Sizes
-constexpr float kCharacterSpriteScale = 2.0f;
-constexpr float kBombSpriteScale = 2.0f;
-constexpr float kPowerUpSpriteScale = 2.0f;
+constexpr float kCharacterSpriteScale = 1.9f;
+constexpr float kBombSpriteScale = 2.2f;
+constexpr float kPowerUpSpriteScale = 2.2f;
 
 }
 

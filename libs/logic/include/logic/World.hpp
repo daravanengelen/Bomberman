@@ -143,6 +143,12 @@ private:
     [[nodiscard]] bool hasBombAt(const Vector2& position) const;
     [[nodiscard]] bool isSpawnCell(int gridX, int gridY, int gridWidth, int gridHeight) const;
     [[nodiscard]] Vector2 gridToWorld(int gridX, int gridY) const;
+    /** @brief Converts a world position to integer grid coordinates. */
+    void worldToGrid(const Vector2& position, int& gridX, int& gridY) const;
+    /** @brief Snaps a world position to the center of its grid cell. */
+    [[nodiscard]] Vector2 snapToCellCenter(const Vector2& position) const;
+    /** @brief Kills every living character whose bounds overlap the blast cell. */
+    void killCharactersInBlastCell(const Vector2& cellCenter, unsigned int ownerId);
     [[nodiscard]] Vector2 getCellHalfExtents() const;
     [[nodiscard]] Vector2 getCharacterHalfExtents() const;
     [[nodiscard]] Vector2 getBombHalfExtents() const;

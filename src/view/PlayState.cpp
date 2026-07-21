@@ -160,16 +160,22 @@ void PlayState::update(Game& game, float deltaTime) {
 }
 
 void PlayState::render(Game& game, sf::RenderTarget& target) {
-    target.clear(sf::Color(45, 52, 42));
+    target.clear(sf::Color(57, 132, 0)); // floor green from Walltiles.png
     game.getFactory()->renderAll(target);
 
     if (game.hasFont()) {
         std::ostringstream hud;
         hud << "Score: " << game.getScore()->getCurrentScore();
+
+        if (const auto player = m_world.findCharacter(m_playerId)) {
+            hud << "   Fire: " << player->getBlastRadius()
+                << "   Bombs: " << player->getMaxBombs();
+        }
+
         const float centerX = static_cast<float>(Game::kWindowWidth) * 0.5f;
-        drawCenteredText(target, game.getFont(), hud.str(), 20, sf::Color::White, centerX, 24.f);
+        drawCenteredText(target, game.getFont(), hud.str(), 20, sf::Color(160,32,240), centerX, 24.f);
         drawCenteredText(target, game.getFont(), "Arrows move | Space bomb | Esc menu", 16,
-                         sf::Color(220, 220, 220), centerX,
+                         sf::Color(160, 32, 240), centerX,
                          static_cast<float>(Game::kWindowHeight) - 20.f);
     }
 }

@@ -128,6 +128,50 @@ Vector2 World::gridToWorld(int gridX, int gridY) const {
     };
 }
 
+void World::worldToGrid(const Vector2& position, int& gridX, int& gridY) const {
+    if (m_cellWidth <= 0.f || m_cellHeight <= 0.f) {
+        gridX = 0;
+        gridY = 0;
+        return;
+    }
+
+    gridX = static_cast<int>(std::floor((position.x - kWorldMin) / m_cellWidth));
+    gridY = static_cast<int>(std::floor((position.y - kWorldMin) / m_cellHeight));
+    gridX = std::clamp(gridX, 0, std::max(0, m_gridWidth - 1));
+    gridY = std::clamp(gridY, 0, std::max(0, m_gridHeight - 1));
+}
+
+Vector2 World::snapToCellCenter(const Vector2& position) const {
+    int gridX = 0;
+    int gridY = 0;
+    worldToGrid(position, gridX, gridY);
+    return gridToWorld(gridX, gridY);
+}
+
+void World::killCharactersInBlastCell(const Vector2& cellCenter, unsigned int ownerId) {
+    int cellX = 0;
+    int cellY = 0;
+    worldToGrid(cellCenter, cellX, cellY);
+
+    for (const auto& entity : m_entities) {
+        if (!entity || !entity->isActive() || entity->getType() != EntityType::Character) {
+            continue;
+        }
+
+        const auto character = std::static_pointer_cast<Character>(entity);
+        if (!character->isAlive()) {
+            continue;
+        }
+
+        int characterX = 0;
+        int characterY = 0;
+        worldToGrid(character->getPosition(), characterX, characterY);
+        if (characterX == cellX && characterY == cellY) {
+            handleCharacterDeath(character, ownerId);
+        }
+    }
+}
+
 bool World::isSpawnCell(int gridX, int gridY, int gridWidth, int gridHeight) const {
     const bool topLeft = gridX <= 3 && gridY >= gridHeight - 4;
     const bool topRight = gridX >= gridWidth - 4 && gridY >= gridHeight - 4;
@@ -431,9 +475,14 @@ bool World::tryPlaceBomb(unsigned int characterId) {
         return false;
     }
 
-    const std::shared_ptr<Bomb> bomb = createBomb(character->getPosition(), getBombHalfExtents(),
-                                                  kBombFuseDuration, character->getBlastRadius(),
-                                                  characterId);
+    const Vector2 bombPosition = snapToCellCenter(character->getPosition());
+    if (hasBombAt(bombPosition)) {
+        return false;
+    }
+
+    const std::shared_ptr<Bomb> bomb =
+        createBomb(bombPosition, getBombHalfExtents(), kBombFuseDuration,
+                   character->getBlastRadius(), characterId);
     addEntity(bomb);
     return true;
 }
@@ -493,13 +542,26 @@ void World::updateBombs(float deltaTime) {
 
 void World::castExplosionRay(const Vector2& origin, const Vector2& direction, int maxRadius,
                              unsigned int ownerId) {
-    const Vector2 step = {direction.x * m_cellWidth, direction.y * m_cellHeight};
+    if (maxRadius <= 0) {
+        return;
+    }
+
+    int originX = 0;
+    int originY = 0;
+    worldToGrid(origin, originX, originY);
+
+    const int stepX = static_cast<int>(direction.x);
+    const int stepY = static_cast<int>(direction.y);
 
     for (int radius = 1; radius <= maxRadius; ++radius) {
-        const Vector2 probeCenter = origin + step * static_cast<float>(radius);
-        const AABB probe =
-            AABB::fromCenterHalfExtents(probeCenter, getCellHalfExtents());
+        const int gridX = originX + stepX * radius;
+        const int gridY = originY + stepY * radius;
 
+        if (gridX < 0 || gridY < 0 || gridX >= m_gridWidth || gridY >= m_gridHeight) {
+            return;
+        }
+
+        const Vector2 cellCenter = gridToWorld(gridX, gridY);
         bool blocked = false;
 
         for (const auto& entity : m_entities) {
@@ -507,7 +569,10 @@ void World::castExplosionRay(const Vector2& origin, const Vector2& direction, in
                 continue;
             }
 
-            if (!entity->getBounds().intersects(probe)) {
+            int entityX = 0;
+            int entityY = 0;
+            worldToGrid(entity->getPosition(), entityX, entityY);
+            if (entityX != gridX || entityY != gridY) {
                 continue;
             }
 
@@ -526,9 +591,7 @@ void World::castExplosionRay(const Vector2& origin, const Vector2& direction, in
                 if (Random::getInstance().range(0.f, 1.f) < kPowerUpDropChance) {
                     const int roll = Random::getInstance().range(0, 2);
                     const PowerUpType type = static_cast<PowerUpType>(roll);
-                    // Spawn on the destroyed wall's cell center (not probeCenter),
-                    // otherwise an off-grid bomb ray can place the pickup on a neighbour.
-                    queueSpawn(createPowerUp(entity->getPosition(), getPowerUpHalfExtents(), type));
+                    queueSpawn(createPowerUp(cellCenter, getPowerUpHalfExtents(), type));
                 }
 
                 blocked = true;
@@ -542,19 +605,16 @@ void World::castExplosionRay(const Vector2& origin, const Vector2& direction, in
                 blocked = true;
                 break;
             }
-            case EntityType::Character: {
-                const auto character = std::static_pointer_cast<Character>(entity);
-                if (character->isAlive()) {
-                    handleCharacterDeath(character, ownerId);
-                }
+            case EntityType::Character:
                 break;
-            }
             case EntityType::PowerUp:
                 entity->setActive(false);
                 removeEntity(entity->getId());
                 break;
             }
         }
+
+        killCharactersInBlastCell(cellCenter, ownerId);
 
         if (blocked) {
             return;
@@ -571,21 +631,15 @@ void World::detonateBomb(const std::shared_ptr<Bomb>& bomb) {
     bomb->setActive(false);
     removeEntity(bomb->getId());
 
-    const Vector2 origin = bomb->getPosition();
-    const int blastRadius = bomb->getBlastRadius();
-
+    const Vector2 origin = snapToCellCenter(bomb->getPosition());
     const unsigned int ownerId = bomb->getOwnerId();
 
-    for (const auto& entity : m_entities) {
-        if (!entity || !entity->isActive() || entity->getType() != EntityType::Character) {
-            continue;
-        }
-
-        const auto character = std::static_pointer_cast<Character>(entity);
-        if (character->isAlive() && character->getBounds().intersects(bomb->getBounds())) {
-            handleCharacterDeath(character, ownerId);
-        }
+    int blastRadius = std::max(1, bomb->getBlastRadius());
+    if (const std::shared_ptr<Character> owner = findCharacter(ownerId)) {
+        blastRadius = std::max(1, owner->getBlastRadius());
     }
+
+    killCharactersInBlastCell(origin, ownerId);
 
     castExplosionRay(origin, kDirectionRight, blastRadius, ownerId);
     castExplosionRay(origin, kDirectionLeft, blastRadius, ownerId);
