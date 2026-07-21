@@ -1,3 +1,8 @@
+/**
+ * @file Random.cpp
+ * @brief Implementation of @ref Logic::Random.
+ */
+
 #include "logic/Random.hpp"
 
 namespace Logic {
@@ -34,4 +39,4 @@ std::mt19937& Random::engine() noexcept {
     return *m_engine;
 }
 
-} // namespace Logic
+}

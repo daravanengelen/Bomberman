@@ -3,6 +3,13 @@ find_package(SFML 2.5 COMPONENTS system window graphics REQUIRED)
 
 add_executable(bomberman
     main.cpp
+    Game.cpp
+    GameFactory.cpp
+    EntityView.cpp
+    Ui.cpp
+    MenuState.cpp
+    PlayState.cpp
+    GameOverState.cpp
 )
 
 target_link_libraries(bomberman

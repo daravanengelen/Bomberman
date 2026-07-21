@@ -1,3 +1,8 @@
+/**
+ * @file Stopwatch.cpp
+ * @brief Implementation of @ref Logic::Stopwatch.
+ */
+
 #include "logic/Stopwatch.hpp"
 
 namespace Logic {
@@ -32,4 +37,4 @@ float Stopwatch::getElapsedTime() const {
     return Seconds{Clock::now() - m_start}.count();
 }
 
-} // namespace Logic
+}

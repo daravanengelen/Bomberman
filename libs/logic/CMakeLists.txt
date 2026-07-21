@@ -12,6 +12,14 @@ endif()
 add_library(bomberman_logic STATIC
     src/Stopwatch.cpp
     src/Random.cpp
+    src/Camera.cpp
+    src/Entity.cpp
+    src/Character.cpp
+    src/Bomb.cpp
+    src/Wall.cpp
+    src/PowerUp.cpp
+    src/World.cpp
+    src/Score.cpp
 )
 
 add_library(Bomberman::Logic ALIAS bomberman_logic)

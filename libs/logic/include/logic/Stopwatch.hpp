@@ -4,21 +4,26 @@
 
 namespace Logic {
 
-/// Monotonic frame timer for the game loop (singleton).
+/**
+ * @brief Singleton frame timer.
+ *
+ * Provides per-frame @c deltaTime for frame-rate-independent movement and animation.
+ */
 class Stopwatch {
 public:
+    /** @return The single global stopwatch instance. */
     static Stopwatch& getInstance();
 
-    /// Reset the clock; the next tick() produces deltaTime == 0.
+    /** @brief Resets timing; the next @ref tick() yields @c deltaTime == 0. */
     void reset();
 
-    /// Call once per frame before updating game logic.
+    /** @brief Call once per frame before updating game logic. */
     void tick();
 
-    /// Seconds elapsed since the previous tick().
+    /** @return Seconds elapsed since the previous @ref tick(). */
     [[nodiscard]] float getDeltaTime() const noexcept;
 
-    /// Total seconds elapsed since the last reset().
+    /** @return Total seconds elapsed since the last @ref reset(). */
     [[nodiscard]] float getElapsedTime() const;
 
     Stopwatch(const Stopwatch&) = delete;
@@ -33,9 +38,9 @@ private:
     using TimePoint = Clock::time_point;
     using Seconds = std::chrono::duration<float>;
 
-    TimePoint m_start{};
-    TimePoint m_lastFrame{};
-    float m_deltaTime{0.f};
+    TimePoint m_start{};      ///< Time at last @ref reset().
+    TimePoint m_lastFrame{};  ///< Time at previous @ref tick().
+    float m_deltaTime{0.f};   ///< Seconds since previous @ref tick().
 };
 
-} // namespace Logic
+}
