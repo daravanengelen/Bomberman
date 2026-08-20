@@ -10,7 +10,6 @@ GitHub repository: https://github.com/daravanengelen/Bomberman
 TO DO 
 - explosion animation
 - description design choices
-- Ai for opponents
+- improve ai opponents
 - diagram class strucure
-- generate documentation
 - tests
