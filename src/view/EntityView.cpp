@@ -10,7 +10,9 @@
 #include <logic/PowerUp.hpp>
 #include <logic/Wall.hpp>
 
+#include <array>
 #include <algorithm>
+#include <cmath>
 #include <filesystem>
 
 namespace View {
@@ -111,6 +113,10 @@ const sf::IntRect kBombRect = tileRect(7, 22);
 const sf::IntRect kFirePowerUpRect = tileRect(0, 22);
 const sf::IntRect kExtraBombPowerUpRect = tileRect(1, 22);
 const sf::IntRect kSkatesPowerUpRect = tileRect(2, 22);
+const std::array<sf::IntRect, 3> kPlayerDown{{{0, 32, 32, 32}, {32, 32, 32, 32}, {64, 32, 32, 32}}};
+const std::array<sf::IntRect, 3> kPlayerUp{{{0, 64, 32, 32}, {32, 64, 32, 32}, {64, 64, 32, 32}}};
+const std::array<sf::IntRect, 5> kPlayerRight{{{96, 32, 32, 32}, {128, 32, 32, 32}, {160, 32, 32, 32},
+                                               {192, 32, 32, 32}, {224, 32, 32, 32}}};
 
 // Sizes
 constexpr float kCharacterSpriteScale = 1.9f;
@@ -186,6 +192,47 @@ CharacterView::CharacterView(const std::shared_ptr<Logic::Entity>& model, Logic:
     syncFromModel();
 }
 
+CharacterView::FacingDirection CharacterView::directionFromDelta(const sf::Vector2f& delta) const {
+    const float absX = std::abs(delta.x);
+    const float absY = std::abs(delta.y);
+
+    if (absX >= absY) {
+        return delta.x >= 0.f ? FacingDirection::Right : FacingDirection::Left;
+    }
+
+    return delta.y >= 0.f ? FacingDirection::Down : FacingDirection::Up;
+}
+
+void CharacterView::configurePlayerSprite(const sf::Vector2f& size, const sf::Vector2f& center,
+                                          FacingDirection facing, std::size_t frameIndex) {
+    const sf::IntRect rect = [&]() {
+        switch (facing) {
+        case FacingDirection::Down:
+            return kPlayerDown[frameIndex % kPlayerDown.size()];
+        case FacingDirection::Up:
+            return kPlayerUp[frameIndex % kPlayerUp.size()];
+        case FacingDirection::Right:
+        case FacingDirection::Left:
+            return kPlayerRight[frameIndex % kPlayerRight.size()];
+        }
+
+        return kPlayerDown[0];
+    }();
+
+    const bool flipHorizontally = facing == FacingDirection::Left;
+
+    m_sprite.setTexture(spriteAtlas(), true);
+    m_sprite.setTextureRect(rect);
+    m_sprite.setOrigin(static_cast<float>(rect.width) * 0.5f, static_cast<float>(rect.height) * 0.5f);
+    m_sprite.setScale((flipHorizontally ? -1.f : 1.f) * size.x / static_cast<float>(rect.width),
+                      size.y / static_cast<float>(rect.height));
+    m_sprite.setPosition(center);
+    m_sprite.setColor(sf::Color(255, 255, 255));
+
+    m_facing = facing;
+    m_frameIndex = frameIndex;
+}
+
 void CharacterView::syncFromModel() {
     if (!hasSpriteAtlas()) {
         m_visible = false;
@@ -207,9 +254,36 @@ void CharacterView::syncFromModel() {
     const sf::Vector2f size = toPixelSize(model->getHalfExtents() * 2.f);
     const sf::Vector2f center = toPixels(model->getPosition());
 
-    configureSprite(m_sprite, character->isPlayer() ? kCharacterRect : kCharacterAltRect,
-                    size * kCharacterSpriteScale, center,
-                    character->isPlayer() ? sf::Color(255, 255, 255) : sf::Color(255, 210, 210));
+    if (!character->isPlayer()) {
+        configureSprite(m_sprite, kCharacterAltRect, size * kCharacterSpriteScale, center,
+                        sf::Color(255, 210, 210));
+        m_visible = true;
+        return;
+    }
+
+    if (!m_hasLastPosition) {
+        m_lastPosition = center;
+        m_hasLastPosition = true;
+        configurePlayerSprite(size * kCharacterSpriteScale, center, FacingDirection::Down, 0);
+        m_visible = true;
+        return;
+    }
+
+    const sf::Vector2f delta = center - m_lastPosition;
+    const float movedDistanceSquared = delta.x * delta.x + delta.y * delta.y;
+    if (movedDistanceSquared > 0.0001f) {
+        const FacingDirection nextFacing = directionFromDelta(delta);
+        const std::size_t nextFrameIndex = nextFacing == m_facing
+                                               ? (m_frameIndex + 1)
+                                               : 0;
+
+        configurePlayerSprite(size * kCharacterSpriteScale, center, nextFacing, nextFrameIndex);
+        m_lastPosition = center;
+        m_visible = true;
+        return;
+    }
+
+    m_sprite.setPosition(center);
     m_visible = true;
 }
 

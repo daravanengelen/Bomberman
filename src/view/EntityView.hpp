@@ -71,7 +71,17 @@ public:
     void render(sf::RenderTarget& target) const override;
 
 private:
+    enum class FacingDirection { Down, Up, Right, Left };
+
+    void configurePlayerSprite(const sf::Vector2f& size, const sf::Vector2f& center,
+                               FacingDirection facing, std::size_t frameIndex);
+    FacingDirection directionFromDelta(const sf::Vector2f& delta) const;
+
     sf::Sprite m_sprite;
+    sf::Vector2f m_lastPosition{0.f, 0.f};
+    bool m_hasLastPosition{false};
+    FacingDirection m_facing{FacingDirection::Down};
+    std::size_t m_frameIndex{0};
 };
 
 /** @brief Renders active bombs as sprites. */
