@@ -12,3 +12,5 @@ TO DO
 - description design choices
 - Ai for opponents
 - diagram class strucure
+- generate documentation
+- tests
