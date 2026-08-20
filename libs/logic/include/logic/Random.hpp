@@ -47,4 +47,4 @@ private:
     std::unique_ptr<std::mt19937> m_engine; ///< Owned PRNG engine.
 };
 
-}
+} // namespace Logic

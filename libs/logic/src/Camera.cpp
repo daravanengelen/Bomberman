@@ -7,9 +7,7 @@
 
 namespace Logic {
 
-Camera::Camera(unsigned int screenWidth, unsigned int screenHeight) {
-    setScreenSize(screenWidth, screenHeight);
-}
+Camera::Camera(unsigned int screenWidth, unsigned int screenHeight) { setScreenSize(screenWidth, screenHeight); }
 
 void Camera::setScreenSize(unsigned int screenWidth, unsigned int screenHeight) noexcept {
     m_screenWidth = screenWidth > 0 ? screenWidth : 1;
@@ -34,4 +32,4 @@ Vector2 Camera::projectSize(const Vector2& worldSize) const {
     return {worldSize.x * halfW, worldSize.y * halfH};
 }
 
-}
+} // namespace Logic

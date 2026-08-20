@@ -13,9 +13,7 @@
 
 namespace Logic {
 
-void Score::resetCurrentScore() noexcept {
-    m_currentScore = 0;
-}
+void Score::resetCurrentScore() noexcept { m_currentScore = 0; }
 
 void Score::onGameEvent(const GameEvent& event) {
     switch (event.type) {
@@ -79,4 +77,4 @@ void Score::commitCurrentScore(const std::string& filePath) {
     saveHighScores(filePath);
 }
 
-}
+} // namespace Logic

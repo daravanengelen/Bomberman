@@ -54,4 +54,4 @@ private:
     std::vector<int> m_highScores;
 };
 
-}
+} // namespace Logic

@@ -10,9 +10,7 @@
 
 namespace View {
 
-void MenuState::onEnter(Game& game) {
-    game.getScore()->loadHighScores(Game::kHighScoreFile);
-}
+void MenuState::onEnter(Game& game) { game.getScore()->loadHighScores(Game::kHighScoreFile); }
 
 bool MenuState::isPlayButtonClicked(const sf::Vector2i& pixel) const {
     return m_playButton.contains(static_cast<float>(pixel.x), static_cast<float>(pixel.y));
@@ -45,8 +43,7 @@ void MenuState::render(Game& game, sf::RenderTarget& target) {
     const float centerX = static_cast<float>(Game::kWindowWidth) * 0.5f;
 
     if (game.hasFont()) {
-        drawCenteredText(target, game.getFont(), "BOMBERMAN", 48, sf::Color(255, 220, 90), centerX,
-                         90.f);
+        drawCenteredText(target, game.getFont(), "BOMBERMAN", 48, sf::Color(255, 220, 90), centerX, 90.f);
         drawCenteredText(target, game.getFont(), "Top Scores", 28, sf::Color::White, centerX, 170.f);
     } else {
         drawPanel(target, {250.f, 50.f, 300.f, 60.f}, sf::Color(255, 220, 90), sf::Color::Black);
@@ -64,14 +61,11 @@ void MenuState::render(Game& game, sf::RenderTarget& target) {
         }
 
         if (game.hasFont()) {
-            drawCenteredText(target, game.getFont(), line.str(), 22, sf::Color(210, 210, 220),
-                             centerX, scoreY);
+            drawCenteredText(target, game.getFont(), line.str(), 22, sf::Color(210, 210, 220), centerX, scoreY);
         } else {
-            const float width = index < highScores.size()
-                                    ? static_cast<float>(highScores[index]) * 0.6f + 40.f
-                                    : 40.f;
-            drawPanel(target, {centerX - width * 0.5f, scoreY - 12.f, width, 24.f},
-                      sf::Color(100, 180, 255), sf::Color::Black);
+            const float width = index < highScores.size() ? static_cast<float>(highScores[index]) * 0.6f + 40.f : 40.f;
+            drawPanel(target, {centerX - width * 0.5f, scoreY - 12.f, width, 24.f}, sf::Color(100, 180, 255),
+                      sf::Color::Black);
         }
         scoreY += 34.f;
     }
@@ -83,4 +77,4 @@ void MenuState::render(Game& game, sf::RenderTarget& target) {
     }
 }
 
-}
+} // namespace View

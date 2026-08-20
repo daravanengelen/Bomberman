@@ -18,8 +18,7 @@ void drawCenteredText(sf::RenderTarget& target, const sf::Font& font, const std:
     target.draw(label);
 }
 
-void drawPanel(sf::RenderTarget& target, const sf::FloatRect& rect, sf::Color fill,
-               sf::Color outline) {
+void drawPanel(sf::RenderTarget& target, const sf::FloatRect& rect, sf::Color fill, sf::Color outline) {
     sf::RectangleShape panel({rect.width, rect.height});
     panel.setPosition(rect.left, rect.top);
     panel.setFillColor(fill);
@@ -28,4 +27,4 @@ void drawPanel(sf::RenderTarget& target, const sf::FloatRect& rect, sf::Color fi
     target.draw(panel);
 }
 
-}
+} // namespace View

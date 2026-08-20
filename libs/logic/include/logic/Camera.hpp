@@ -60,4 +60,4 @@ private:
     unsigned int m_screenHeight{1}; ///< Current screen height in pixels.
 };
 
-}
+} // namespace Logic

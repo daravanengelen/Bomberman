@@ -21,8 +21,8 @@ class GameFactory;
  */
 class Game {
 public:
-    static constexpr unsigned int kWindowWidth = 800;  ///< Window width in pixels.
-    static constexpr unsigned int kWindowHeight = 600; ///< Window height in pixels.
+    static constexpr unsigned int kWindowWidth = 800;           ///< Window width in pixels.
+    static constexpr unsigned int kWindowHeight = 600;          ///< Window height in pixels.
     static constexpr const char* kHighScoreFile = "scores.txt"; ///< Persisted leaderboard path.
 
     /** @brief Creates the window and shared game services. */
@@ -69,4 +69,4 @@ private:
     std::unique_ptr<State> m_currentState;
 };
 
-}
+} // namespace View

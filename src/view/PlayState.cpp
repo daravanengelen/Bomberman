@@ -9,9 +9,53 @@
 #include <logic/Random.hpp>
 #include <logic/Stopwatch.hpp>
 
+#include <algorithm>
+#include <array>
+#include <cmath>
+#include <limits>
 #include <sstream>
+#include <unordered_map>
 
 namespace View {
+
+namespace {
+
+bool isPositionThreatened(const Logic::World& world, const Logic::Vector2& position) {
+    for (const auto& entity : world.getEntities()) {
+        if (!entity || !entity->isActive() || entity->getType() != Logic::EntityType::Bomb) {
+            continue;
+        }
+
+        const auto bomb = std::static_pointer_cast<Logic::Bomb>(entity);
+        if (bomb->isExploded()) {
+            continue;
+        }
+
+        const Logic::Vector2 delta = position - bomb->getPosition();
+        const float blastReach = world.getCellWidth() * static_cast<float>(bomb->getBlastRadius() + 1);
+
+        if (delta.lengthSquared() < 0.22f) {
+            return true;
+        }
+
+        const bool sameRow = std::abs(delta.y) < 0.10f && std::abs(delta.x) <= blastReach;
+        const bool sameColumn = std::abs(delta.x) < 0.10f && std::abs(delta.y) <= blastReach;
+        if (sameRow || sameColumn) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool bombCanHitPlayer(const Logic::World& world, const Logic::Character& bot, const Logic::Character& player) {
+    const Logic::Vector2 toPlayer = player.getPosition() - bot.getPosition();
+    const float cellSize = world.getCellWidth();
+    return (std::abs(toPlayer.x) < 0.25f && std::abs(toPlayer.y) <= cellSize * 2.2f) ||
+           (std::abs(toPlayer.y) < 0.25f && std::abs(toPlayer.x) <= cellSize * 2.2f);
+}
+
+} // namespace
 
 void PlayState::onEnter(Game& game) {
     game.getScore()->resetCurrentScore();
@@ -99,9 +143,13 @@ void PlayState::updateMovement(float deltaTime) {
 }
 
 void PlayState::updateBots(float deltaTime) {
-    m_botDecisionTimer -= deltaTime;
+    static std::unordered_map<unsigned int, float> botDecisionTimers;
+    static std::unordered_map<unsigned int, Logic::Vector2> botDirections;
+    static std::unordered_map<unsigned int, float> botBombCooldowns;
+
     auto& random = Logic::Random::getInstance();
     const bool botsMayBomb = m_matchTime >= 5.f;
+    const float moveStride = 6.0f;
 
     for (const auto& entity : m_world.getEntities()) {
         if (!entity || !entity->isActive() || entity->getType() != Logic::EntityType::Character) {
@@ -113,31 +161,96 @@ void PlayState::updateBots(float deltaTime) {
             continue;
         }
 
-        if (m_botDecisionTimer <= 0.f) {
-            Logic::Vector2 direction{};
-            switch (random.range(0, 3)) {
-            case 0:
-                direction = {1.f, 0.f};
-                break;
-            case 1:
-                direction = {-1.f, 0.f};
-                break;
-            case 2:
-                direction = {0.f, 1.f};
-                break;
-            default:
-                direction = {0.f, -1.f};
-                break;
-            }
-            m_world.tryMoveCharacter(character->getId(), direction, deltaTime);
-            if (botsMayBomb && random.range(0, 100) < 8) {
-                m_world.tryPlaceBomb(character->getId());
+        float& decisionTimer = botDecisionTimers[character->getId()];
+        decisionTimer -= deltaTime;
+        if (decisionTimer > 0.f) {
+            continue;
+        }
+
+        const auto player = m_world.findCharacter(m_playerId);
+        const bool currentlySafe = !isPositionThreatened(m_world, character->getPosition());
+
+        std::array<Logic::Vector2, 4> directions = {
+            Logic::Vector2{1.f, 0.f},
+            Logic::Vector2{-1.f, 0.f},
+            Logic::Vector2{0.f, 1.f},
+            Logic::Vector2{0.f, -1.f},
+        };
+
+        const int bias = static_cast<int>(character->getId()) % 4;
+        std::rotate(directions.begin(), directions.begin() + bias, directions.end());
+
+        if (player) {
+            const Logic::Vector2 toPlayer = player->getPosition() - character->getPosition();
+            if (std::abs(toPlayer.x) > std::abs(toPlayer.y)) {
+                directions[0] = {toPlayer.x >= 0.f ? 1.f : -1.f, 0.f};
+                directions[1] = {0.f, toPlayer.y >= 0.f ? 1.f : -1.f};
+            } else if (toPlayer.lengthSquared() > 0.f) {
+                directions[0] = {0.f, toPlayer.y >= 0.f ? 1.f : -1.f};
+                directions[1] = {toPlayer.x >= 0.f ? 1.f : -1.f, 0.f};
             }
         }
-    }
 
-    if (m_botDecisionTimer <= 0.f) {
-        m_botDecisionTimer = 0.5f;
+        Logic::Vector2 bestDirection{};
+        float bestScore = std::numeric_limits<float>::infinity();
+
+        for (const auto& direction : directions) {
+            if (direction.lengthSquared() == 0.f) {
+                continue;
+            }
+
+            const Logic::Vector2 target = character->getPosition() + direction * 0.9f;
+            const bool safeTarget = !isPositionThreatened(m_world, target);
+            if (!safeTarget) {
+                continue;
+            }
+
+            float score = 0.f;
+            if (player) {
+                score += (player->getPosition() - target).lengthSquared();
+            }
+
+            const bool movingAwayFromBomb = !isPositionThreatened(m_world, target + direction * 0.25f);
+            if (!movingAwayFromBomb) {
+                score += 1000.f;
+            }
+
+            if (score < bestScore) {
+                bestScore = score;
+                bestDirection = direction;
+            }
+        }
+
+        bool moved = false;
+        if (bestDirection.lengthSquared() > 0.f) {
+            moved = m_world.tryMoveCharacter(character->getId(), bestDirection, deltaTime * moveStride);
+        }
+
+        if (moved) {
+            botDirections[character->getId()] = bestDirection;
+        } else {
+            botDirections.erase(character->getId());
+            decisionTimer = 0.12f + random.range(0.f, 0.17f);
+            continue;
+        }
+
+        float& bombCooldown = botBombCooldowns[character->getId()];
+        bombCooldown -= deltaTime;
+
+        if (botsMayBomb && bombCooldown <= 0.f && currentlySafe && player) {
+            const Logic::Vector2 toPlayer = player->getPosition() - character->getPosition();
+            const bool aligned = std::abs(toPlayer.x) < 0.25f || std::abs(toPlayer.y) < 0.25f;
+            const bool closeEnough = toPlayer.lengthSquared() < 1.8f;
+            const bool safeToBomb = !isPositionThreatened(m_world, character->getPosition());
+            const bool canHitPlayer = bombCanHitPlayer(m_world, *character, *player);
+
+            if (aligned && closeEnough && safeToBomb && canHitPlayer && m_world.tryPlaceBomb(character->getId())) {
+                bombCooldown = 1.8f + random.range(0.f, 1.4f) + static_cast<float>((character->getId() % 3)) * 0.2f;
+                botDirections.erase(character->getId());
+            }
+        }
+
+        decisionTimer = 0.12f + random.range(0.f, 0.25f) + static_cast<float>((character->getId() % 5)) * 0.05f;
     }
 }
 
@@ -154,8 +267,7 @@ void PlayState::update(Game& game, float deltaTime) {
     }
 
     updateMovement(deltaTime);
-    // TODO: Change this to a more sophisticated bot AI later.
-    // updateBots(deltaTime);
+    updateBots(deltaTime);
     m_world.update(deltaTime);
 }
 
@@ -168,16 +280,14 @@ void PlayState::render(Game& game, sf::RenderTarget& target) {
         hud << "Score: " << game.getScore()->getCurrentScore();
 
         if (const auto player = m_world.findCharacter(m_playerId)) {
-            hud << "   Fire: " << player->getBlastRadius()
-                << "   Bombs: " << player->getMaxBombs();
+            hud << "   Fire: " << player->getBlastRadius() << "   Bombs: " << player->getMaxBombs();
         }
 
         const float centerX = static_cast<float>(Game::kWindowWidth) * 0.5f;
-        drawCenteredText(target, game.getFont(), hud.str(), 20, sf::Color(160,32,240), centerX, 24.f);
-        drawCenteredText(target, game.getFont(), "Arrows move | Space bomb | Esc menu", 16,
-                         sf::Color(160, 32, 240), centerX,
-                         static_cast<float>(Game::kWindowHeight) - 20.f);
+        drawCenteredText(target, game.getFont(), hud.str(), 20, sf::Color(160, 32, 240), centerX, 24.f);
+        drawCenteredText(target, game.getFont(), "Arrows move | Space bomb | Esc menu", 16, sf::Color(160, 32, 240),
+                         centerX, static_cast<float>(Game::kWindowHeight) - 20.f);
     }
 }
 
-}
+} // namespace View

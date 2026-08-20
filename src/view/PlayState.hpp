@@ -45,4 +45,4 @@ private:
     float m_matchTime{0.f};
 };
 
-}
+} // namespace View

@@ -43,9 +43,7 @@ public:
     void setHalfExtents(const Vector2& halfExtents) { m_halfExtents = halfExtents; }
 
     /** @return Axis-aligned bounding box derived from position and half-extents. */
-    [[nodiscard]] AABB getBounds() const {
-        return AABB::fromCenterHalfExtents(m_position, m_halfExtents);
-    }
+    [[nodiscard]] AABB getBounds() const { return AABB::fromCenterHalfExtents(m_position, m_halfExtents); }
 
     /** @return `true` while the entity is still part of the simulation. */
     [[nodiscard]] bool isActive() const noexcept { return m_active; }

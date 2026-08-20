@@ -23,8 +23,7 @@ public:
      * @param halfExtents Half-width and half-height of the pickup bounds.
      * @param powerUpType Effect applied when collected.
      */
-    PowerUp(unsigned int id, const Vector2& position, const Vector2& halfExtents,
-            PowerUpType powerUpType);
+    PowerUp(unsigned int id, const Vector2& position, const Vector2& halfExtents, PowerUpType powerUpType);
 
     /** @return The effect type of this pickup. */
     [[nodiscard]] PowerUpType getPowerUpType() const noexcept { return m_powerUpType; }
@@ -33,4 +32,4 @@ private:
     PowerUpType m_powerUpType;
 };
 
-}
+} // namespace Logic

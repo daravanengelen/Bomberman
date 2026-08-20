@@ -1,9 +1,9 @@
 #pragma once
 
-#include <SFML/Graphics/RenderTarget.hpp>
-#include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/Rect.hpp>
+#include <SFML/Graphics/RenderTarget.hpp>
 #include <string>
 
 namespace View {
@@ -28,7 +28,6 @@ void drawCenteredText(sf::RenderTarget& target, const sf::Font& font, const std:
  * @param fill Interior color.
  * @param outline Border color.
  */
-void drawPanel(sf::RenderTarget& target, const sf::FloatRect& rect, sf::Color fill,
-               sf::Color outline);
+void drawPanel(sf::RenderTarget& target, const sf::FloatRect& rect, sf::Color fill, sf::Color outline);
 
-}
+} // namespace View

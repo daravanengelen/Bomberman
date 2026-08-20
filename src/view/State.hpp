@@ -1,7 +1,7 @@
 #pragma once
 
-#include <SFML/Window/Event.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
+#include <SFML/Window/Event.hpp>
 
 namespace View {
 
@@ -42,4 +42,4 @@ public:
     virtual void render(Game& game, sf::RenderTarget& target) = 0;
 };
 
-}
+} // namespace View

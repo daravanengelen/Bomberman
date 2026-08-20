@@ -7,9 +7,7 @@
 
 namespace Logic {
 
-Wall::Wall(unsigned int id, const Vector2& position, const Vector2& halfExtents,
-           bool indestructible)
-    : Entity(EntityType::Wall, id, position, halfExtents),
-      m_indestructible(indestructible) {}
+Wall::Wall(unsigned int id, const Vector2& position, const Vector2& halfExtents, bool indestructible)
+    : Entity(EntityType::Wall, id, position, halfExtents), m_indestructible(indestructible) {}
 
-}
+} // namespace Logic

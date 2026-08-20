@@ -73,8 +73,8 @@ public:
 private:
     enum class FacingDirection { Down, Up, Right, Left };
 
-    void configurePlayerSprite(const sf::Vector2f& size, const sf::Vector2f& center,
-                               FacingDirection facing, std::size_t frameIndex);
+    void configurePlayerSprite(const sf::Vector2f& size, const sf::Vector2f& center, FacingDirection facing,
+                               std::size_t frameIndex);
     FacingDirection directionFromDelta(const sf::Vector2f& delta) const;
 
     sf::Sprite m_sprite;
@@ -106,4 +106,4 @@ private:
     sf::Sprite m_sprite;
 };
 
-}
+} // namespace View

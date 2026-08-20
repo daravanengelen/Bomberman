@@ -17,8 +17,7 @@ namespace View {
 
 Game::Game()
     : m_window(sf::VideoMode(kWindowWidth, kWindowHeight), "Bomberman", sf::Style::Close),
-      m_camera(kWindowWidth, kWindowHeight),
-      m_factory(std::make_shared<GameFactory>(m_camera)),
+      m_camera(kWindowWidth, kWindowHeight), m_factory(std::make_shared<GameFactory>(m_camera)),
       m_score(std::make_shared<Logic::Score>()) {
     m_hasFont = loadFont();
     m_window.setFramerateLimit(60);
@@ -57,8 +56,7 @@ void Game::run() {
 
     while (m_window.isOpen()) {
         stopwatch.tick();
-        const float deltaTime =
-            std::min(stopwatch.getDeltaTime(), 1.f / 30.f);
+        const float deltaTime = std::min(stopwatch.getDeltaTime(), 1.f / 30.f);
 
         sf::Event event{};
         while (m_window.pollEvent(event)) {
@@ -76,4 +74,4 @@ void Game::run() {
     }
 }
 
-}
+} // namespace View

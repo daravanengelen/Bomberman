@@ -12,13 +12,9 @@ Random& Random::getInstance() {
     return instance;
 }
 
-Random::Random() : m_engine(std::make_unique<std::mt19937>()) {
-    seedFromRandomDevice();
-}
+Random::Random() : m_engine(std::make_unique<std::mt19937>()) { seedFromRandomDevice(); }
 
-void Random::seed(unsigned int value) {
-    m_engine->seed(value);
-}
+void Random::seed(unsigned int value) { m_engine->seed(value); }
 
 void Random::seedFromRandomDevice() {
     std::random_device rd;
@@ -35,8 +31,6 @@ float Random::range(float min, float max) {
     return dist(*m_engine);
 }
 
-std::mt19937& Random::engine() noexcept {
-    return *m_engine;
-}
+std::mt19937& Random::engine() noexcept { return *m_engine; }
 
-}
+} // namespace Logic

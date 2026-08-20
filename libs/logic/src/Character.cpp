@@ -7,10 +7,8 @@
 
 namespace Logic {
 
-Character::Character(unsigned int id, const Vector2& position, const Vector2& halfExtents,
-                     float moveSpeed, bool isPlayer)
-    : Entity(EntityType::Character, id, position, halfExtents),
-      m_moveSpeed(moveSpeed),
-      m_isPlayer(isPlayer) {}
+Character::Character(unsigned int id, const Vector2& position, const Vector2& halfExtents, float moveSpeed,
+                     bool isPlayer)
+    : Entity(EntityType::Character, id, position, halfExtents), m_moveSpeed(moveSpeed), m_isPlayer(isPlayer) {}
 
-}
+} // namespace Logic

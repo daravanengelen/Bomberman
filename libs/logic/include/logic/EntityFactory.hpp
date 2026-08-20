@@ -28,8 +28,7 @@ public:
      * @param indestructible `true` for permanent arena blocks.
      * @return Shared pointer to the new wall.
      */
-    virtual std::shared_ptr<Wall> createWall(unsigned int id, const Vector2& position,
-                                             const Vector2& halfExtents,
+    virtual std::shared_ptr<Wall> createWall(unsigned int id, const Vector2& position, const Vector2& halfExtents,
                                              bool indestructible) = 0;
 
     /**
@@ -42,8 +41,7 @@ public:
      * @return Shared pointer to the new character.
      */
     virtual std::shared_ptr<Character> createCharacter(unsigned int id, const Vector2& position,
-                                                       const Vector2& halfExtents, float moveSpeed,
-                                                       bool isPlayer) = 0;
+                                                       const Vector2& halfExtents, float moveSpeed, bool isPlayer) = 0;
 
     /**
      * @brief Creates a bomb owned by a character.
@@ -55,9 +53,8 @@ public:
      * @param ownerId Identifier of the placing character.
      * @return Shared pointer to the new bomb.
      */
-    virtual std::shared_ptr<Bomb> createBomb(unsigned int id, const Vector2& position,
-                                             const Vector2& halfExtents, float fuseDuration,
-                                             int blastRadius, unsigned int ownerId) = 0;
+    virtual std::shared_ptr<Bomb> createBomb(unsigned int id, const Vector2& position, const Vector2& halfExtents,
+                                             float fuseDuration, int blastRadius, unsigned int ownerId) = 0;
 
     /**
      * @brief Creates a collectible power-up.
@@ -67,8 +64,7 @@ public:
      * @param powerUpType Effect applied when collected.
      * @return Shared pointer to the new power-up.
      */
-    virtual std::shared_ptr<PowerUp> createPowerUp(unsigned int id, const Vector2& position,
-                                                   const Vector2& halfExtents,
+    virtual std::shared_ptr<PowerUp> createPowerUp(unsigned int id, const Vector2& position, const Vector2& halfExtents,
                                                    PowerUpType powerUpType) = 0;
 
     /** @brief Removes all view objects held by the concrete factory. */

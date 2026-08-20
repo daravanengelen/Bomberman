@@ -60,4 +60,4 @@ void Entity::notifyRemoved() const {
     notifyObservers(event);
 }
 
-}
+} // namespace Logic

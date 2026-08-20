@@ -34,4 +34,4 @@ private:
     Logic::GameOutcome m_outcome;
 };
 
-}
+} // namespace View

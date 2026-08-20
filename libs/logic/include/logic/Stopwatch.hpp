@@ -38,9 +38,9 @@ private:
     using TimePoint = Clock::time_point;
     using Seconds = std::chrono::duration<float>;
 
-    TimePoint m_start{};      ///< Time at last @ref reset().
-    TimePoint m_lastFrame{};  ///< Time at previous @ref tick().
-    float m_deltaTime{0.f};   ///< Seconds since previous @ref tick().
+    TimePoint m_start{};     ///< Time at last @ref reset().
+    TimePoint m_lastFrame{}; ///< Time at previous @ref tick().
+    float m_deltaTime{0.f};  ///< Seconds since previous @ref tick().
 };
 
-}
+} // namespace Logic

@@ -20,8 +20,8 @@ public:
      * @param blastRadius Tile reach of the explosion in each direction.
      * @param ownerId Identifier of the character that placed the bomb.
      */
-    Bomb(unsigned int id, const Vector2& position, const Vector2& halfExtents,
-         float fuseDuration, int blastRadius, unsigned int ownerId);
+    Bomb(unsigned int id, const Vector2& position, const Vector2& halfExtents, float fuseDuration, int blastRadius,
+         unsigned int ownerId);
 
     /** @return Total fuse duration in seconds. */
     [[nodiscard]] float getFuseDuration() const noexcept { return m_fuseDuration; }
@@ -52,4 +52,4 @@ private:
     bool m_exploded{false};
 };
 
-}
+} // namespace Logic

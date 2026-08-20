@@ -17,8 +17,7 @@ public:
      * @param moveSpeed Movement speed in normalized units per second.
      * @param isPlayer `true` for the human player, `false` for a bot.
      */
-    Character(unsigned int id, const Vector2& position, const Vector2& halfExtents,
-              float moveSpeed, bool isPlayer);
+    Character(unsigned int id, const Vector2& position, const Vector2& halfExtents, float moveSpeed, bool isPlayer);
 
     /** @return Movement speed in normalized units per second. */
     [[nodiscard]] float getMoveSpeed() const noexcept { return m_moveSpeed; }
@@ -55,4 +54,4 @@ private:
     int m_blastRadius{1};
 };
 
-}
+} // namespace Logic

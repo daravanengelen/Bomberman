@@ -26,16 +26,15 @@ public:
     explicit GameFactory(Logic::Camera& camera);
 
     std::shared_ptr<Logic::Wall> createWall(unsigned int id, const Logic::Vector2& position,
-                                            const Logic::Vector2& halfExtents,
-                                            bool indestructible) override;
+                                            const Logic::Vector2& halfExtents, bool indestructible) override;
 
     std::shared_ptr<Logic::Character> createCharacter(unsigned int id, const Logic::Vector2& position,
-                                                      const Logic::Vector2& halfExtents,
-                                                      float moveSpeed, bool isPlayer) override;
+                                                      const Logic::Vector2& halfExtents, float moveSpeed,
+                                                      bool isPlayer) override;
 
     std::shared_ptr<Logic::Bomb> createBomb(unsigned int id, const Logic::Vector2& position,
-                                            const Logic::Vector2& halfExtents, float fuseDuration,
-                                            int blastRadius, unsigned int ownerId) override;
+                                            const Logic::Vector2& halfExtents, float fuseDuration, int blastRadius,
+                                            unsigned int ownerId) override;
 
     std::shared_ptr<Logic::PowerUp> createPowerUp(unsigned int id, const Logic::Vector2& position,
                                                   const Logic::Vector2& halfExtents,
@@ -58,4 +57,4 @@ private:
     std::vector<std::shared_ptr<EntityView>> m_views;
 };
 
-}
+} // namespace View

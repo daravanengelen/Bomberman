@@ -35,7 +35,7 @@ constexpr Vector2 kDirectionDown{0.f, -1.f};
     return AABB::fromCenterHalfExtents(clampedCenter, halfExtents);
 }
 
-}
+} // namespace
 
 World::World() : m_detonationScratch(std::make_unique<std::vector<unsigned int>>()) {}
 
@@ -55,13 +55,9 @@ void World::clear() {
     m_outcome = GameOutcome::Playing;
 }
 
-unsigned int World::allocateId() {
-    return m_nextEntityId++;
-}
+unsigned int World::allocateId() { return m_nextEntityId++; }
 
-void World::setEntityFactory(const std::shared_ptr<EntityFactory>& factory) {
-    m_entityFactory = factory;
-}
+void World::setEntityFactory(const std::shared_ptr<EntityFactory>& factory) { m_entityFactory = factory; }
 
 void World::attachWorldObserver(const std::shared_ptr<Observer>& observer) {
     if (observer) {
@@ -100,14 +96,11 @@ unsigned int World::getPlayerId() const {
     return 0;
 }
 
-Vector2 World::getCellHalfExtents() const {
-    return {m_cellWidth * 0.5f, m_cellHeight * 0.5f};
-}
+Vector2 World::getCellHalfExtents() const { return {m_cellWidth * 0.5f, m_cellHeight * 0.5f}; }
 
 Vector2 World::getCharacterHalfExtents() const {
     const Vector2 cellHalfExtents = getCellHalfExtents();
-    return {cellHalfExtents.x * kCharacterHalfExtentScale,
-            cellHalfExtents.y * kCharacterHalfExtentScale};
+    return {cellHalfExtents.x * kCharacterHalfExtentScale, cellHalfExtents.y * kCharacterHalfExtentScale};
 }
 
 Vector2 World::getBombHalfExtents() const {
@@ -117,8 +110,7 @@ Vector2 World::getBombHalfExtents() const {
 
 Vector2 World::getPowerUpHalfExtents() const {
     const Vector2 cellHalfExtents = getCellHalfExtents();
-    return {cellHalfExtents.x * kPowerUpHalfExtentScale,
-            cellHalfExtents.y * kPowerUpHalfExtentScale};
+    return {cellHalfExtents.x * kPowerUpHalfExtentScale, cellHalfExtents.y * kPowerUpHalfExtentScale};
 }
 
 Vector2 World::gridToWorld(int gridX, int gridY) const {
@@ -194,8 +186,7 @@ void World::generateArena(int gridWidth, int gridHeight, float emptyCellChance) 
     for (int gridY = 0; gridY < gridHeight; ++gridY) {
         for (int gridX = 0; gridX < gridWidth; ++gridX) {
             const Vector2 center = gridToWorld(gridX, gridY);
-            const bool isBorder = gridX == 0 || gridY == 0 || gridX == gridWidth - 1 ||
-                                  gridY == gridHeight - 1;
+            const bool isBorder = gridX == 0 || gridY == 0 || gridX == gridWidth - 1 || gridY == gridHeight - 1;
             const bool isPillar = gridX % 2 == 0 && gridY % 2 == 0;
 
             if (isBorder || isPillar) {
@@ -239,8 +230,7 @@ void World::spawnCharacters(float moveSpeed) {
     }
 }
 
-std::shared_ptr<Wall> World::createWall(const Vector2& position, const Vector2& halfExtents,
-                                        bool indestructible) {
+std::shared_ptr<Wall> World::createWall(const Vector2& position, const Vector2& halfExtents, bool indestructible) {
     const unsigned int id = allocateId();
     if (m_entityFactory) {
         return m_entityFactory->createWall(id, position, halfExtents, indestructible);
@@ -248,8 +238,7 @@ std::shared_ptr<Wall> World::createWall(const Vector2& position, const Vector2& 
     return std::make_shared<Wall>(id, position, halfExtents, indestructible);
 }
 
-std::shared_ptr<Character> World::createCharacter(const Vector2& position,
-                                                  const Vector2& halfExtents, float moveSpeed,
+std::shared_ptr<Character> World::createCharacter(const Vector2& position, const Vector2& halfExtents, float moveSpeed,
                                                   bool isPlayer) {
     const unsigned int id = allocateId();
     if (m_entityFactory) {
@@ -258,13 +247,11 @@ std::shared_ptr<Character> World::createCharacter(const Vector2& position,
     return std::make_shared<Character>(id, position, halfExtents, moveSpeed, isPlayer);
 }
 
-std::shared_ptr<Bomb> World::createBomb(const Vector2& position, const Vector2& halfExtents,
-                                        float fuseDuration, int blastRadius,
-                                        unsigned int ownerId) {
+std::shared_ptr<Bomb> World::createBomb(const Vector2& position, const Vector2& halfExtents, float fuseDuration,
+                                        int blastRadius, unsigned int ownerId) {
     const unsigned int id = allocateId();
     if (m_entityFactory) {
-        return m_entityFactory->createBomb(id, position, halfExtents, fuseDuration, blastRadius,
-                                           ownerId);
+        return m_entityFactory->createBomb(id, position, halfExtents, fuseDuration, blastRadius, ownerId);
     }
     return std::make_shared<Bomb>(id, position, halfExtents, fuseDuration, blastRadius, ownerId);
 }
@@ -283,21 +270,15 @@ std::shared_ptr<Entity> World::addEntity(std::shared_ptr<Entity> entity) {
     return m_entities.back();
 }
 
-void World::queueSpawn(std::shared_ptr<Entity> entity) {
-    m_pendingSpawns.push_back(std::move(entity));
-}
+void World::queueSpawn(std::shared_ptr<Entity> entity) { m_pendingSpawns.push_back(std::move(entity)); }
 
-void World::removeEntity(unsigned int id) {
-    m_pendingRemovals.push_back(id);
-}
+void World::removeEntity(unsigned int id) { m_pendingRemovals.push_back(id); }
 
 void World::flushPendingChanges() {
     for (const unsigned int id : m_pendingRemovals) {
         m_entities.erase(
             std::remove_if(m_entities.begin(), m_entities.end(),
-                           [id](const std::shared_ptr<Entity>& entity) {
-                               return entity && entity->getId() == id;
-                           }),
+                           [id](const std::shared_ptr<Entity>& entity) { return entity && entity->getId() == id; }),
             m_entities.end());
     }
     m_pendingRemovals.clear();
@@ -399,8 +380,7 @@ void World::updateBombExitState() {
     }
 }
 
-bool World::tryMoveCharacter(unsigned int characterId, const Vector2& direction,
-                             float deltaTime) {
+bool World::tryMoveCharacter(unsigned int characterId, const Vector2& direction, float deltaTime) {
     if (!isPlaying()) {
         return false;
     }
@@ -417,8 +397,7 @@ bool World::tryMoveCharacter(unsigned int characterId, const Vector2& direction,
 
     const Vector2 delta = normalizedDirection * (character->getMoveSpeed() * deltaTime);
     const Vector2 targetPosition = character->getPosition() + delta;
-    const AABB targetBounds =
-        clampedBounds(targetPosition, character->getHalfExtents());
+    const AABB targetBounds = clampedBounds(targetPosition, character->getHalfExtents());
 
     if (isPositionBlocked(targetBounds, characterId)) {
         return false;
@@ -481,8 +460,7 @@ bool World::tryPlaceBomb(unsigned int characterId) {
     }
 
     const std::shared_ptr<Bomb> bomb =
-        createBomb(bombPosition, getBombHalfExtents(), kBombFuseDuration,
-                   character->getBlastRadius(), characterId);
+        createBomb(bombPosition, getBombHalfExtents(), kBombFuseDuration, character->getBlastRadius(), characterId);
     addEntity(bomb);
     return true;
 }
@@ -540,8 +518,7 @@ void World::updateBombs(float deltaTime) {
     }
 }
 
-void World::castExplosionRay(const Vector2& origin, const Vector2& direction, int maxRadius,
-                             unsigned int ownerId) {
+void World::castExplosionRay(const Vector2& origin, const Vector2& direction, int maxRadius, unsigned int ownerId) {
     if (maxRadius <= 0) {
         return;
     }
@@ -647,8 +624,7 @@ void World::detonateBomb(const std::shared_ptr<Bomb>& bomb) {
     castExplosionRay(origin, kDirectionDown, blastRadius, ownerId);
 }
 
-void World::handleCharacterDeath(const std::shared_ptr<Character>& character,
-                                 unsigned int killerId) {
+void World::handleCharacterDeath(const std::shared_ptr<Character>& character, unsigned int killerId) {
     character->setAlive(false);
     character->setActive(false);
 
@@ -706,9 +682,8 @@ void World::update(float deltaTime) {
     m_detonationScratch->assign(m_detonationQueue.begin(), m_detonationQueue.end());
     m_detonationQueue.clear();
     std::sort(m_detonationScratch->begin(), m_detonationScratch->end());
-    m_detonationScratch->erase(
-        std::unique(m_detonationScratch->begin(), m_detonationScratch->end()),
-        m_detonationScratch->end());
+    m_detonationScratch->erase(std::unique(m_detonationScratch->begin(), m_detonationScratch->end()),
+                               m_detonationScratch->end());
 
     for (const unsigned int bombId : *m_detonationScratch) {
         const std::shared_ptr<Entity> entity = findEntity(bombId);
@@ -724,4 +699,4 @@ void World::update(float deltaTime) {
     dispatchWorldEvent(GameEventType::WorldTick);
 }
 
-}
+} // namespace Logic

@@ -10,8 +10,8 @@
 #include <logic/PowerUp.hpp>
 #include <logic/Wall.hpp>
 
-#include <array>
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <filesystem>
 
@@ -77,30 +77,23 @@ const sf::Texture& wallTilesAtlas() {
     return texture;
 }
 
-bool hasSpriteAtlas() {
-    return spriteAtlas().getSize().x != 0U;
-}
+bool hasSpriteAtlas() { return spriteAtlas().getSize().x != 0U; }
 
-bool hasWallTilesAtlas() {
-    return wallTilesAtlas().getSize().x != 0U;
-}
+bool hasWallTilesAtlas() { return wallTilesAtlas().getSize().x != 0U; }
 
-void configureSprite(sf::Sprite& sprite, const sf::Texture& texture, const sf::IntRect& rect,
-                     const sf::Vector2f& size, const sf::Vector2f& center,
-                     const sf::Color& tint = sf::Color::White, float rotation = 0.f) {
+void configureSprite(sf::Sprite& sprite, const sf::Texture& texture, const sf::IntRect& rect, const sf::Vector2f& size,
+                     const sf::Vector2f& center, const sf::Color& tint = sf::Color::White, float rotation = 0.f) {
     sprite.setTexture(texture, true);
     sprite.setTextureRect(rect);
     sprite.setOrigin(static_cast<float>(rect.width) * 0.5f, static_cast<float>(rect.height) * 0.5f);
-    sprite.setScale(size.x / static_cast<float>(rect.width),
-                    size.y / static_cast<float>(rect.height));
+    sprite.setScale(size.x / static_cast<float>(rect.width), size.y / static_cast<float>(rect.height));
     sprite.setPosition(center);
     sprite.setRotation(rotation);
     sprite.setColor(tint);
 }
 
-void configureSprite(sf::Sprite& sprite, const sf::IntRect& rect, const sf::Vector2f& size,
-                     const sf::Vector2f& center, const sf::Color& tint = sf::Color::White,
-                     float rotation = 0.f) {
+void configureSprite(sf::Sprite& sprite, const sf::IntRect& rect, const sf::Vector2f& size, const sf::Vector2f& center,
+                     const sf::Color& tint = sf::Color::White, float rotation = 0.f) {
     configureSprite(sprite, spriteAtlas(), rect, size, center, tint, rotation);
 }
 
@@ -115,15 +108,15 @@ const sf::IntRect kExtraBombPowerUpRect = tileRect(1, 22);
 const sf::IntRect kSkatesPowerUpRect = tileRect(2, 22);
 const std::array<sf::IntRect, 3> kPlayerDown{{{0, 32, 32, 32}, {32, 32, 32, 32}, {64, 32, 32, 32}}};
 const std::array<sf::IntRect, 3> kPlayerUp{{{0, 64, 32, 32}, {32, 64, 32, 32}, {64, 64, 32, 32}}};
-const std::array<sf::IntRect, 5> kPlayerRight{{{96, 32, 32, 32}, {128, 32, 32, 32}, {160, 32, 32, 32},
-                                               {192, 32, 32, 32}, {224, 32, 32, 32}}};
+const std::array<sf::IntRect, 5> kPlayerRight{
+    {{96, 32, 32, 32}, {128, 32, 32, 32}, {160, 32, 32, 32}, {192, 32, 32, 32}, {224, 32, 32, 32}}};
 
 // Sizes
 constexpr float kCharacterSpriteScale = 1.9f;
 constexpr float kBombSpriteScale = 2.2f;
 constexpr float kPowerUpSpriteScale = 2.2f;
 
-}
+} // namespace
 
 EntityView::EntityView(const std::shared_ptr<Logic::Entity>& model, Logic::Camera& camera)
     : m_model(model), m_camera(camera) {}
@@ -134,8 +127,7 @@ void EntityView::onGameEvent(const Logic::GameEvent& event) {
         return;
     }
 
-    if (event.type == Logic::GameEventType::EntityMoved ||
-        event.type == Logic::GameEventType::WorldTick) {
+    if (event.type == Logic::GameEventType::EntityMoved || event.type == Logic::GameEventType::WorldTick) {
         syncFromModel();
     }
 }
@@ -150,9 +142,7 @@ sf::Vector2f EntityView::toPixelSize(const Logic::Vector2& worldSize) const {
     return {pixelSize.x, pixelSize.y};
 }
 
-std::shared_ptr<Logic::Entity> EntityView::lockModel() const {
-    return m_model.lock();
-}
+std::shared_ptr<Logic::Entity> EntityView::lockModel() const { return m_model.lock(); }
 
 WallView::WallView(const std::shared_ptr<Logic::Entity>& model, Logic::Camera& camera)
     : EntityView(model, camera), m_sprite() {
@@ -174,8 +164,7 @@ void WallView::syncFromModel() {
     const auto wall = std::static_pointer_cast<Logic::Wall>(model);
     const sf::Vector2f size = toPixelSize(model->getHalfExtents() * 2.f);
     const sf::Vector2f center = toPixels(model->getPosition());
-    const sf::IntRect& rect =
-        wall->isIndestructible() ? kIndestructibleWallRect : kDestructibleWallRect;
+    const sf::IntRect& rect = wall->isIndestructible() ? kIndestructibleWallRect : kDestructibleWallRect;
 
     configureSprite(m_sprite, wallTilesAtlas(), rect, size, center);
     m_visible = true;
@@ -203,8 +192,8 @@ CharacterView::FacingDirection CharacterView::directionFromDelta(const sf::Vecto
     return delta.y >= 0.f ? FacingDirection::Down : FacingDirection::Up;
 }
 
-void CharacterView::configurePlayerSprite(const sf::Vector2f& size, const sf::Vector2f& center,
-                                          FacingDirection facing, std::size_t frameIndex) {
+void CharacterView::configurePlayerSprite(const sf::Vector2f& size, const sf::Vector2f& center, FacingDirection facing,
+                                          std::size_t frameIndex) {
     const sf::IntRect rect = [&]() {
         switch (facing) {
         case FacingDirection::Down:
@@ -255,8 +244,7 @@ void CharacterView::syncFromModel() {
     const sf::Vector2f center = toPixels(model->getPosition());
 
     if (!character->isPlayer()) {
-        configureSprite(m_sprite, kCharacterAltRect, size * kCharacterSpriteScale, center,
-                        sf::Color(255, 210, 210));
+        configureSprite(m_sprite, kCharacterAltRect, size * kCharacterSpriteScale, center, sf::Color(255, 210, 210));
         m_visible = true;
         return;
     }
@@ -273,9 +261,7 @@ void CharacterView::syncFromModel() {
     const float movedDistanceSquared = delta.x * delta.x + delta.y * delta.y;
     if (movedDistanceSquared > 0.0001f) {
         const FacingDirection nextFacing = directionFromDelta(delta);
-        const std::size_t nextFrameIndex = nextFacing == m_facing
-                                               ? (m_frameIndex + 1)
-                                               : 0;
+        const std::size_t nextFrameIndex = nextFacing == m_facing ? (m_frameIndex + 1) : 0;
 
         configurePlayerSprite(size * kCharacterSpriteScale, center, nextFacing, nextFrameIndex);
         m_lastPosition = center;
@@ -374,4 +360,4 @@ void PowerUpView::render(sf::RenderTarget& target) const {
     }
 }
 
-}
+} // namespace View

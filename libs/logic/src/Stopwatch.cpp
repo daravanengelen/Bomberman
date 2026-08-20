@@ -12,9 +12,7 @@ Stopwatch& Stopwatch::getInstance() {
     return instance;
 }
 
-Stopwatch::Stopwatch() {
-    reset();
-}
+Stopwatch::Stopwatch() { reset(); }
 
 void Stopwatch::reset() {
     const TimePoint now = Clock::now();
@@ -29,12 +27,8 @@ void Stopwatch::tick() {
     m_lastFrame = now;
 }
 
-float Stopwatch::getDeltaTime() const noexcept {
-    return m_deltaTime;
-}
+float Stopwatch::getDeltaTime() const noexcept { return m_deltaTime; }
 
-float Stopwatch::getElapsedTime() const {
-    return Seconds{Clock::now() - m_start}.count();
-}
+float Stopwatch::getElapsedTime() const { return Seconds{Clock::now() - m_start}.count(); }
 
-}
+} // namespace Logic

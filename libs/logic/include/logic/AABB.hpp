@@ -34,17 +34,13 @@ struct AABB {
      * @brief Returns the center point of the box.
      * @return Center as a @ref Vector2.
      */
-    [[nodiscard]] Vector2 getCenter() const {
-        return {(minX + maxX) * 0.5f, (minY + maxY) * 0.5f};
-    }
+    [[nodiscard]] Vector2 getCenter() const { return {(minX + maxX) * 0.5f, (minY + maxY) * 0.5f}; }
 
     /**
      * @brief Returns the half-width and half-height of the box.
      * @return Half-extents as a @ref Vector2.
      */
-    [[nodiscard]] Vector2 getHalfExtents() const {
-        return {(maxX - minX) * 0.5f, (maxY - minY) * 0.5f};
-    }
+    [[nodiscard]] Vector2 getHalfExtents() const { return {(maxX - minX) * 0.5f, (maxY - minY) * 0.5f}; }
 
     /**
      * @brief Tests overlap with another axis-aligned box.
@@ -52,9 +48,8 @@ struct AABB {
      * @return `true` if the boxes intersect (edges touching counts as overlap).
      */
     [[nodiscard]] bool intersects(const AABB& other) const noexcept {
-        return minX < other.maxX && maxX > other.minX && minY < other.maxY &&
-               maxY > other.minY;
+        return minX < other.maxX && maxX > other.minX && minY < other.maxY && maxY > other.minY;
     }
 };
 
-}
+} // namespace Logic

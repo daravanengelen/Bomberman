@@ -16,8 +16,7 @@ public:
      * @param halfExtents Half-width and half-height of the tile.
      * @param indestructible Whether explosions can destroy this wall.
      */
-    Wall(unsigned int id, const Vector2& position, const Vector2& halfExtents,
-         bool indestructible);
+    Wall(unsigned int id, const Vector2& position, const Vector2& halfExtents, bool indestructible);
 
     /** @return `true` if the wall cannot be destroyed by explosions. */
     [[nodiscard]] bool isIndestructible() const noexcept { return m_indestructible; }
@@ -29,4 +28,4 @@ private:
     bool m_indestructible;
 };
 
-}
+} // namespace Logic

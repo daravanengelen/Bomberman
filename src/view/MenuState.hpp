@@ -32,4 +32,4 @@ private:
     sf::FloatRect m_playButton{300.f, 420.f, 200.f, 60.f};
 };
 
-}
+} // namespace View

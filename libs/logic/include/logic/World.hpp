@@ -1,13 +1,13 @@
 #pragma once
 
-#include "logic/EntityFactory.hpp"
-#include "logic/Observer.hpp"
 #include "logic/Bomb.hpp"
 #include "logic/Character.hpp"
 #include "logic/Entity.hpp"
+#include "logic/EntityFactory.hpp"
+#include "logic/Observer.hpp"
 #include "logic/PowerUp.hpp"
-#include "logic/Wall.hpp"
 #include "logic/Vector2.hpp"
+#include "logic/Wall.hpp"
 
 #include <memory>
 #include <unordered_map>
@@ -88,9 +88,7 @@ public:
     [[nodiscard]] std::shared_ptr<Character> findCharacter(unsigned int id) const;
 
     /** @return All entities currently in the world. */
-    [[nodiscard]] const std::vector<std::shared_ptr<Entity>>& getEntities() const noexcept {
-        return m_entities;
-    }
+    [[nodiscard]] const std::vector<std::shared_ptr<Entity>>& getEntities() const noexcept { return m_entities; }
 
     /** @return Current match outcome. */
     [[nodiscard]] GameOutcome getOutcome() const noexcept { return m_outcome; }
@@ -111,13 +109,11 @@ public:
     [[nodiscard]] int getSpawnedBotCount() const noexcept { return m_spawnedBotCount; }
 
 private:
-    std::shared_ptr<Wall> createWall(const Vector2& position, const Vector2& halfExtents,
-                                     bool indestructible);
-    std::shared_ptr<Character> createCharacter(const Vector2& position,
-                                               const Vector2& halfExtents, float moveSpeed,
+    std::shared_ptr<Wall> createWall(const Vector2& position, const Vector2& halfExtents, bool indestructible);
+    std::shared_ptr<Character> createCharacter(const Vector2& position, const Vector2& halfExtents, float moveSpeed,
                                                bool isPlayer);
-    std::shared_ptr<Bomb> createBomb(const Vector2& position, const Vector2& halfExtents,
-                                     float fuseDuration, int blastRadius, unsigned int ownerId);
+    std::shared_ptr<Bomb> createBomb(const Vector2& position, const Vector2& halfExtents, float fuseDuration,
+                                     int blastRadius, unsigned int ownerId);
     std::shared_ptr<PowerUp> createPowerUp(const Vector2& position, const Vector2& halfExtents,
                                            PowerUpType powerUpType);
 
@@ -132,8 +128,7 @@ private:
 
     void updateBombs(float deltaTime);
     void detonateBomb(const std::shared_ptr<Bomb>& bomb);
-    void castExplosionRay(const Vector2& origin, const Vector2& direction, int maxRadius,
-                          unsigned int ownerId);
+    void castExplosionRay(const Vector2& origin, const Vector2& direction, int maxRadius, unsigned int ownerId);
 
     void handleCharacterDeath(const std::shared_ptr<Character>& character, unsigned int killerId);
     void tryPickupPowerUp(const std::shared_ptr<Character>& character);
@@ -154,8 +149,7 @@ private:
     [[nodiscard]] Vector2 getBombHalfExtents() const;
     [[nodiscard]] Vector2 getPowerUpHalfExtents() const;
     void evaluateOutcome();
-    void dispatchWorldEvent(GameEventType type, unsigned int entityId = 0,
-                            unsigned int sourceId = 0) const;
+    void dispatchWorldEvent(GameEventType type, unsigned int entityId = 0, unsigned int sourceId = 0) const;
     void notifyEntityTicks() const;
 
     unsigned int m_nextEntityId{1};
@@ -178,4 +172,4 @@ private:
     std::vector<std::weak_ptr<Observer>> m_worldObservers;
 };
 
-}
+} // namespace Logic

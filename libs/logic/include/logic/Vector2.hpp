@@ -17,19 +17,13 @@ struct Vector2 {
     constexpr Vector2(float xValue, float yValue) : x(xValue), y(yValue) {}
 
     /** @brief Component-wise addition. */
-    Vector2 operator+(const Vector2& other) const {
-        return {x + other.x, y + other.y};
-    }
+    Vector2 operator+(const Vector2& other) const { return {x + other.x, y + other.y}; }
 
     /** @brief Component-wise subtraction. */
-    Vector2 operator-(const Vector2& other) const {
-        return {x - other.x, y - other.y};
-    }
+    Vector2 operator-(const Vector2& other) const { return {x - other.x, y - other.y}; }
 
     /** @brief Scalar multiplication. */
-    Vector2 operator*(float scalar) const {
-        return {x * scalar, y * scalar};
-    }
+    Vector2 operator*(float scalar) const { return {x * scalar, y * scalar}; }
 
     /** @brief In-place component-wise addition. */
     Vector2& operator+=(const Vector2& other) {
@@ -39,9 +33,7 @@ struct Vector2 {
     }
 
     /** @return Squared Euclidean length. */
-    [[nodiscard]] float lengthSquared() const noexcept {
-        return x * x + y * y;
-    }
+    [[nodiscard]] float lengthSquared() const noexcept { return x * x + y * y; }
 
     /**
      * @brief Returns a unit vector in the same direction.
@@ -58,8 +50,6 @@ struct Vector2 {
 };
 
 /** @brief Scalar multiplication with the vector on the right. */
-inline Vector2 operator*(float scalar, const Vector2& vector) {
-    return vector * scalar;
-}
+inline Vector2 operator*(float scalar, const Vector2& vector) { return vector * scalar; }
 
-}
+} // namespace Logic
