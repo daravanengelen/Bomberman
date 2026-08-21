@@ -26,44 +26,44 @@ This project is a Bomberman-style game implemented with a clear split between lo
 classDiagram
   direction TB
 
-  subgraph LogicLibrary["Logic Library"]
-    class Observer
-    class Score
-    class Entity
-    class Character
-    class Bomb
-    class PowerUp
-    class Wall
-    class EntityFactory
-    class Random
-    class Stopwatch
-    class World
-    class Camera
+  class Observer
+  class Score
+  class Entity
+  class Character
+  class Bomb
+  class PowerUp
+  class Wall
+  class EntityFactory
+  class Random
+  class Stopwatch
+  class World
+  class Camera
 
-    Observer <|-- Score
-    Entity <|-- Character
-    Entity <|-- Bomb
-    Entity <|-- PowerUp
-    Entity <|-- Wall
-  end
+  class EntityView
+  class CharacterView
+  class BombView
+  class WallView
+  class PowerUpView
+  class GameFactory
+  class Game
 
-  subgraph GameRepresentation["Game Representation"]
-    class EntityView
-    class CharacterView
-    class BombView
-    class WallView
-    class PowerUpView
-    class GameFactory
-    class Game
+  Observer <|-- Score
+  Entity <|-- Character
+  Entity <|-- Bomb
+  Entity <|-- PowerUp
+  Entity <|-- Wall
 
-    EntityView <|-- CharacterView
-    EntityView <|-- BombView
-    EntityView <|-- WallView
-    EntityView <|-- PowerUpView
-  end
+  EntityView <|-- CharacterView
+  EntityView <|-- BombView
+  EntityView <|-- WallView
+  EntityView <|-- PowerUpView
 
-  Observer <|-- EntityView
   EntityFactory <|-- GameFactory
+  Observer <|-- EntityView
+  Game --> World
+  World --> Entity
+  World --> Score
+  GameFactory --> EntityView
 ```
 ## Shortcomings
 
