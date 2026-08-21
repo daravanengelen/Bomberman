@@ -24,43 +24,46 @@ This project is a Bomberman-style game implemented with a clear split between lo
 
 ```mermaid
 classDiagram
-  direction LR
+  direction TB
 
-  class Game
-  class MenuState
-  class PlayState
-  class GameOverState
-  class State
-  class World
-  class Entity
-  class Wall
-  class Character
-  class Bomb
-  class PowerUp
-  class EntityFactory
-  class GameFactory
-  class EntityView
-  class Score
+  subgraph LogicLibrary["Logic Library"]
+    class Observer
+    class Score
+    class Entity
+    class Character
+    class Bomb
+    class PowerUp
+    class Wall
+    class EntityFactory
+    class Random
+    class Stopwatch
+    class World
+    class Camera
 
-  Game --> State
-  State <|-- MenuState
-  State <|-- PlayState
-  State <|-- GameOverState
+    Observer <|-- Score
+    Entity <|-- Character
+    Entity <|-- Bomb
+    Entity <|-- PowerUp
+    Entity <|-- Wall
+  end
 
-  PlayState --> World
-  World --> Entity
-  World --> EntityFactory
-  World --> Score
+  subgraph GameRepresentation["Game Representation"]
+    class EntityView
+    class CharacterView
+    class BombView
+    class WallView
+    class PowerUpView
+    class GameFactory
+    class Game
 
-  Entity <|-- Wall
-  Entity <|-- Character
-  Entity <|-- Bomb
-  Entity <|-- PowerUp
+    EntityView <|-- CharacterView
+    EntityView <|-- BombView
+    EntityView <|-- WallView
+    EntityView <|-- PowerUpView
+  end
 
+  Observer <|-- EntityView
   EntityFactory <|-- GameFactory
-  GameFactory --> EntityView
-  Entity --> EntityView
-  Score --> World
 ```
 ## Shortcomings
 
