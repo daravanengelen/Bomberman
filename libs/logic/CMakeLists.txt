@@ -37,3 +37,11 @@ target_compile_definitions(bomberman_logic
     PUBLIC
         BOMBERMAN_LOGIC_BUILD
 )
+
+# Small game-logic tests for the assignment.
+add_executable(logic_tests
+    tests/logic_tests.cpp
+)
+
+target_link_libraries(logic_tests PRIVATE bomberman_logic)
+add_test(NAME logic_tests COMMAND logic_tests)
