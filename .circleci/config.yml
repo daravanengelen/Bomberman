@@ -57,6 +57,9 @@ jobs:
       - run:
           name: Build logic library (no SFML)
           command: cmake --build build-logic -j 2
+      - run:
+          name: Run logic tests
+          command: ctest --test-dir build-logic --output-on-failure
 
   build-gcc:
     docker:
@@ -79,6 +82,9 @@ jobs:
       - run:
           name: Build with GCC 13
           command: cmake --build build -j 2
+      - run:
+          name: Run project tests
+          command: ctest --test-dir build --output-on-failure
 
   build-clang:
     docker:
@@ -104,6 +110,9 @@ jobs:
       - run:
           name: Build with Clang 18
           command: cmake --build build -j 2
+      - run:
+          name: Run project tests
+          command: ctest --test-dir build --output-on-failure
 
 workflows:
   build-and-verify:

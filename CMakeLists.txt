@@ -9,7 +9,7 @@ project(Bomberman
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-cd /Users/daravanengelen/Bomberman && cmake -S . -B build && cmake --build build --target logic_tests && ctest --test-dir build --output-on-failure
+
 enable_testing()
 
 # Export compile commands for IDE/clang-tidy integration.
